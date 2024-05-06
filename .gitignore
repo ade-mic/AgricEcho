@@ -1,4 +1,4 @@
-config~
+*config~
 *~
 setup_mysql_dev.sql
 setup_mysql_test.sql
