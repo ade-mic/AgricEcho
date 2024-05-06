@@ -2,77 +2,112 @@
 """
 Contains the FileStorage class
 """
+import sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
+from os import getenv
+from models.base_model import BaseModel, Base
 
-import json
+# Import your models
+from models.category import Category
+from models.post import Post
+from models.tag import Tag
+from models.post_tag import PostTag
+from models.user import User
+from models.engine.config import AGRICECHO_MYSQL_DB, AGRICECHO_MYSQL_HOST, AGRICECHO_MYSQL_PWD, AGRICECHO_MYSQL_USER
 
-from models.base_model import BaseModel
+# Define the classes dictionary for easier access to model classes
+classes = {"Category": Category, "BaseModel": BaseModel,
+           "User": User, "PostTag": PostTag,
+           "Post": Post, "Tag": Tag}
 
+class DBStorage:
+    """Interacts with the MySQL database using SQLAlchemy"""
 
-classes = {"BaseModel": BaseModel}
+    __engine = None
+    __session = None
 
+    def __init__(self):
+        """Instantiate a DBStorage object"""
+        # AGRICECHO_MYSQL_USER = getenv('AGRICECHO_MYSQL_USER')
+        # AGRICECHO_MYSQL_PWD = getenv('AGRICECHO_MYSQL_PWD')
+        # AGRICECHO_MYSQL_HOST = getenv('AGRICECHO_MYSQL_HOST')
+        # AGRICECHO_MYSQL_DB = getenv('AGRICECHO_MYSQL_DB')
 
-class FileStorage:
-    """serializes instances to a JSON file & deserializes back to instances"""
+                # Print individual environmental variables
+        print(AGRICECHO_MYSQL_USER) #, getenv('AGRICECHO_MYSQL_USER'))
+        print(AGRICECHO_MYSQL_PWD) #, getenv('AGRICECHO_MYSQL_PWD'))
+        print(AGRICECHO_MYSQL_HOST) #:, getenv('AGRICECHO_MYSQL_HOST'))
+        print(AGRICECHO_MYSQL_DB) #:, getenv('AGRICECHO_MYSQL_DB'))
 
-    # string - path to the JSON file
-    __file_path = "file.json"
-    # dictionary - empty but will store all objects by <class name>.id
-    __objects = {}
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.
+                                      format(AGRICECHO_MYSQL_USER,
+                                             AGRICECHO_MYSQL_PWD,
+                                             AGRICECHO_MYSQL_HOST,
+                                             AGRICECHO_MYSQL_DB),
+                                      pool_pre_ping=True)  # Enable pool_pre_ping for MySQL
+        
+        self.__session = scoped_session(sessionmaker(bind=self.__engine))
 
     def all(self, cls=None):
-        """returns the dictionary __objects"""
-        if cls is not None:
-            new_dict = {}
-            for key, value in self.__objects.items():
-                if cls == value.__class__ or cls == value.__class__.__name__:
-                    new_dict[key] = value
-            return new_dict
-        return self.__objects
+        """Query all objects from the database based on class"""
+        new_dict = {}
+        for clss in classes:
+            if cls is None or cls is classes[clss] or cls is clss:
+                objs = self.__session.query(classes[clss]).all()
+                for obj in objs:
+                    key = obj.__class__.__name__ + '.' + obj.id
+                    new_dict[key] = obj
+        return new_dict
 
-    def get(self, cls, id):
-        """retrieves an object based on the class and id"""
-        if cls is not None:
-            mch_objs = [obj for obj in self.__objects.values()
-                        if type(obj) is cls and obj.id == id]
-            if mch_objs:
-                return mch_objs[0]
-        return None
+    def get(self, cls, **kwargs):
+        """
+        Retrieve an object from the database based on class and keyword arguments.
+
+        Args:
+            cls: The class of the object to retrieve.
+            kwargs: Keyword arguments representing the filters for the query.
+
+        Returns:
+            The retrieved object or None if not found.
+        """
+        if self.__session is not None:
+            try:
+                obj = self.__session.query(cls).filter_by(**kwargs)
+                return obj.one_or_none()
+            except NoResultFound:
+                return None  # Or handle the case when no object is found
+        else:
+            raise RuntimeError("Session not initialized")
 
     def count(self, cls=None):
-        """count the number of objects in storage based on the class"""
-        return len(self.all(cls))
+        """Count the number of objects in the database based on class"""
+        if cls is not None:
+            return self.__session.query(cls).count()
+        else:
+            return sum(self.__session.query(cls).count() for cls in classes.values())
 
     def new(self, obj):
-        """sets in __objects the obj with key <obj class name>.id"""
-        if obj is not None:
-            key = obj.__class__.__name__ + "." + obj.id
-            self.__objects[key] = obj
+        """Add a new object to the current session"""
+        self.__session.add(obj)
 
     def save(self):
-        """serializes __objects to the JSON file (path: __file_path)"""
-        json_objects = {}
-        for key in self.__objects:
-            json_objects[key] = self.__objects[key].to_dict()
-        with open(self.__file_path, 'w') as f:
-            json.dump(json_objects, f)
-
-    def reload(self):
-        """deserializes the JSON file to __objects"""
-        try:
-            with open(self.__file_path, 'r') as f:
-                jo = json.load(f)
-            for key in jo:
-                self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
-        except Exception:
-            pass
+        """Commit all changes in the current session to the database"""
+        self.__session.commit()
 
     def delete(self, obj=None):
-        """delete obj from __objects if it’s inside"""
+        """Delete an object from the current session"""
         if obj is not None:
-            key = obj.__class__.__name__ + '.' + obj.id
-            if key in self.__objects:
-                del self.__objects[key]
+            self.__session.delete(obj)
+
+    def reload(self):
+        """Reload data from the database"""
+        Base.metadata.create_all(self.__engine)
+        self.__session.expunge_all()
 
     def close(self):
-        """call reload() method for deserializing the JSON file to objects"""
-        self.reload()
+        """Close the session"""
+        if self.__session:
+            self.__session.remove()
+            self.__session.close()

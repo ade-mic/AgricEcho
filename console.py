@@ -3,7 +3,20 @@
 import cmd
 from datetime import datetime
 import shlex
-# classes = {"BaseModel": BaseModel}
+
+import models
+from models.category import Category
+from models.post import Post
+from models.tag import Tag
+from models.post_tag import PostTag
+from models.user import User
+from models.base_model import BaseModel, Base
+from os import getenv
+
+classes = {"Category": Category, "BaseModel": BaseModel, 
+           "User": User, "PostTag": PostTag,
+           "Post": Post, "Tag": Tag}
+
 
 class AgricEchoCommand(cmd.Cmd):
     """

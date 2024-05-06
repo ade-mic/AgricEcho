@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Homepage</title>
+    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/user_home.css">
+    <link rel="stylesheet" href="../static/css/footer.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+        </div>
+        <a href="/">
+            <h1>AgricEcho</h1>
+        </a>
+    </header>
+    <h2>Welcome to Your User Homepage</h2>
+    
+    <!-- Form to post a new article -->
+    <div class="container">
+        <form action="/post_article" method="POST">
+            <label for="title">Title:</label><br>
+            <input type="text" id="title" name="title" required><br>
+            <label for="content">Content:</label><br>
+            <textarea id="content" name="content" rows="5" required></textarea><br>
+            <input type="submit" value="Post Article">
+        </form>
+    
+        <hr>
+    
+        <!-- List of previous articles -->
+        <h2>Your Previous Articles:</h2>
+        <ul>
+            <li><a href="/article/1">Article 1 Title</a></li>
+            <li><a href="/article/2">Article 2 Title</a></li>
+            <!-- Add more articles dynamically -->
+        </ul>
+    </div>
+    <footer>
+        <p>&copy; 2024 AgricEcho. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+/* Reset default browser styles */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set font family */
+body {
+    font-family: 'Podkova', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333; /* Dark text color */
+    background-color: #fff; /* White background color */
+}
+
+/* Main content container */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* Form styles */
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+form input[type="text"],
+form input[type="email"],
+form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px;
+}
+
+form input[type="submit"] {
+    background-color: #2ecc71; /* Secondary color */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* List of previous articles styles */
+ul {
+    list-style-type: none;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+ul li a {
+    color: #8e44ad; /* Dark color */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+ul li a:hover {
+    color: #f7dc6f; /* Highlight color */
+}

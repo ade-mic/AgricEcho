@@ -1,0 +1,27 @@
+/* Header Styles */
+header {
+    width: 100%;
+    background-color: #7dcea0;
+    color: #fff;
+    height: 70px;
+    border-bottom: 1px solid #2ecc71;
+    display: flex;
+    font-family: 'The Hand', cursive;
+    align-items: center;
+}
+header > a {
+    color: #fff;
+    text-decoration: none;
+}
+
+header > a:hover {
+    text-decoration: none;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    background: url("../images/logo.png") no-repeat center;
+    background-size: contain;
+    padding-left: 10px;
+}

@@ -7,19 +7,13 @@ import sqlalchemy
 from sqlalchemy import Column, String, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-class PostTag(Base, BaseModel):
+class PostTag(BaseModel, Base):
     """PostTag Representation"""
-    if models.storage_t == "db":
-        __tablename__ = 'post_tags'
-        post_id = Column(String, ForeignKey('posts.id'))
-        tag_id = Column(String, ForeignKey('tags.id'))      
-        post = relationship('Post', back_populates='tags')
-        tag = relationship('Tag', back_populates='posts')
-    else:
-        tag = ""
-        post = ""
-        tag_id = ""
-        post_id = ""
+    __tablename__ = 'post_tags'
+    post_id = Column(String(60), ForeignKey('posts.id'))
+    tag_id = Column(String(60), ForeignKey('tags.id'))
+    post = relationship('Post', back_populates='tags')
+    tag = relationship('Tag', back_populates='posts')
     
     def __init__(self, *args, **kwargs):
         """initializes Post"""

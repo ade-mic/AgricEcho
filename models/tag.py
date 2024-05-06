@@ -7,16 +7,12 @@ import sqlalchemy
 from sqlalchemy import Column, String, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-class Tag(Base, BaseModel):
+class Tag(BaseModel, Base):
     """Tags Representative"""
-    if models.storage_t == "db":
-        __tablename__ = 'tags'
-        name = Column(String(50), nullable=False, unique=True)
-        posts = relationship('PostTag', back_populates='tag')
-    else:
-        post_id = ""
-        name = ""
-    
+    __tablename__ = 'tags'
+    name = Column(String(50), nullable=False, unique=True)
+    posts = relationship('PostTag', back_populates='tag')
+
     def __init__(self, *args, **kwargs):
         """initializes Post"""
         super().__init__(*args, **kwargs)

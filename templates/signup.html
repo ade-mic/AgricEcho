@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="../static/css/header.css">
+        <link rel="stylesheet" href="../static/css/footer.css">
+        <link rel="stylesheet" href="../static/css/form.css">
+        <link rel="icon" href="../static/images/logo.png" type="image/png">
+        <title>AgricEcho | SignUp</title>
+    </head>
+</head>
+<body>
+    <header>
+        <div class="logo">
+        </div>
+        <a href="/">
+            <h1>AgricEcho</h1>
+        </a>
+    </header>
+    <div class="container">
+        <h2>Sign Up</h2>
+        <div>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li class="flash-{{ message[1] }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <form action="./signup" method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="first_name" placeholder="First Name" required>
+            <input type="text" name="last_name" placeholder="Last Name" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="./signin">Sign In</a></p>
+    </div>
+    <footer>
+        <p>&copy; 2024 AgricEcho. All rights reserved.</p>
+    </footer>
+</body>
+</html>
