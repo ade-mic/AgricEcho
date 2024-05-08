@@ -1,18 +1,17 @@
 #!/usr/bin/python3
 """Renders Home Page"""
 from flask import Flask, render_template, redirect, request, url_for, session, flash
-from models.base_model import BaseModel
-from models.category import Category
-from models.post import Post
-from models.tag import Tag
-from models.post_tag import PostTag
-from models.user import User
 from models.base_model import BaseModel, Base
+from models.post import Post
+from models.user import User
+from flask import jsonify
 from os import environ
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.engine.config import SECRET_KEY
 # from models.engine.db_storage import DBStorage
 from models import storage
+import random
+import markdown2
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -21,7 +20,11 @@ app.secret_key = SECRET_KEY
 @app.route('/')
 def index():
     """Render Home Page"""
-    return render_template('index.html')
+    all_posts = storage.all(Post)
+    # num_articles = min(len(all_posts), 10)
+    # top10 = random.sample(list(all_posts), num_articles)
+    print(all_posts)
+    return render_template('index.html', hot_topics=all_posts)
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -60,16 +63,32 @@ def signin():
     """Handles Signin requests"""
     if 'user_id' in session:
         # User already signed in, redirect to user_home
+        if request.method == 'POST' and request.headers.get('Content-Type') =='application/json':
+            return jsonify({'message': 'User is already signed in'}), 400
+        # if not api request
         return redirect(url_for('user_home'))
 
     if request.method == 'POST':
+        if request.headers.get('Content-Type') == 'application/json':
+            # Handle API request
+            data = request.json
+            email = data.get('email')
+            password = data.get('password')
+            # Check if user exists and password matches
+            user = storage.get(User, email=email)
+            if user and check_password_hash(user.password, password):
+                # store user session
+                session['user_id'] = user.id
+                return jsonify({'message': 'Signin successful'}), 200
+            else:
+                return jsonify({'error': 'Invalid email or password.'}), 401
+        
         # Get form data
         email = request.form.get('email')
         password = request.form.get('password')
 
         # Check if the user exists and password matches
         user = storage.get(User, email=email)
-        print(user)
         if user and check_password_hash(user.password, password):
             # Store user session
             session['user_id'] = user.id
@@ -92,10 +111,39 @@ def user_home():
     # Check if user is logged in
     if 'user_id' in session:
         # Render user homepage
-        return render_template('user_home.html')
+        user_posts = storage.get(User, id=session['user_id']).posts
+        return render_template('user_home.html', posts=user_posts)
     else:
         # User not logged in, redirect to sign-in page
         return redirect(url_for('signin'))
+
+@app.route('/post_article', methods=['GET', 'POST'])
+def post_article():
+    """Route for posting article"""
+    if request.method == 'POST':
+        if 'user_id' in session:
+            author_id = session['user_id']
+            title = request.form.get('title')
+            content = request.form.get('content')
+            new_post = Post(title=title, content=content, user_id=author_id)
+            storage.new(new_post)
+            storage.save()
+            return redirect(url_for('user_home'))
+    return render_template('index.html')
+
+@app.route('/view_post/<string:post_id>')
+def view_post(post_id):
+    """Display the full content of a post"""
+    post = storage.get(Post, id=post_id)
+    if post:
+        html_content = markdown2.markdown(post.content)
+        return render_template('view_post.html', post=post,
+                               html_content=html_content)
+    else:
+        flash('Post not found!', 'error')
+        return redirect(url_for('user_home'))
+
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000', debug=True)
-

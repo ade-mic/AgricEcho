@@ -8,7 +8,7 @@ header {
     display: flex;
     font-family: 'The Hand', cursive;
     align-items: center;
-}
+
 header > a {
     color: #fff;
     text-decoration: none;

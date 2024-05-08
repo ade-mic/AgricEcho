@@ -10,17 +10,14 @@ from os import getenv
 from models.base_model import BaseModel, Base
 
 # Import your models
-from models.category import Category
 from models.post import Post
-from models.tag import Tag
-from models.post_tag import PostTag
 from models.user import User
 from models.engine.config import AGRICECHO_MYSQL_DB, AGRICECHO_MYSQL_HOST, AGRICECHO_MYSQL_PWD, AGRICECHO_MYSQL_USER
 
 # Define the classes dictionary for easier access to model classes
-classes = {"Category": Category, "BaseModel": BaseModel,
-           "User": User, "PostTag": PostTag,
-           "Post": Post, "Tag": Tag}
+classes = {"BaseModel": BaseModel,
+           "User": User,
+           "Post": Post}
 
 class DBStorage:
     """Interacts with the MySQL database using SQLAlchemy"""
@@ -30,37 +27,28 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        # AGRICECHO_MYSQL_USER = getenv('AGRICECHO_MYSQL_USER')
-        # AGRICECHO_MYSQL_PWD = getenv('AGRICECHO_MYSQL_PWD')
-        # AGRICECHO_MYSQL_HOST = getenv('AGRICECHO_MYSQL_HOST')
-        # AGRICECHO_MYSQL_DB = getenv('AGRICECHO_MYSQL_DB')
-
-                # Print individual environmental variables
-        print(AGRICECHO_MYSQL_USER) #, getenv('AGRICECHO_MYSQL_USER'))
-        print(AGRICECHO_MYSQL_PWD) #, getenv('AGRICECHO_MYSQL_PWD'))
-        print(AGRICECHO_MYSQL_HOST) #:, getenv('AGRICECHO_MYSQL_HOST'))
-        print(AGRICECHO_MYSQL_DB) #:, getenv('AGRICECHO_MYSQL_DB'))
-
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.
                                       format(AGRICECHO_MYSQL_USER,
                                              AGRICECHO_MYSQL_PWD,
                                              AGRICECHO_MYSQL_HOST,
                                              AGRICECHO_MYSQL_DB),
                                       pool_pre_ping=True)  # Enable pool_pre_ping for MySQL
-        
+
         self.__session = scoped_session(sessionmaker(bind=self.__engine))
 
     def all(self, cls=None):
         """Query all objects from the database based on class"""
-        new_dict = {}
-        for clss in classes:
-            if cls is None or cls is classes[clss] or cls is clss:
-                objs = self.__session.query(classes[clss]).all()
-                for obj in objs:
-                    key = obj.__class__.__name__ + '.' + obj.id
-                    new_dict[key] = obj
-        return new_dict
+        if cls is None:
+            # If cls is None, query all objects from all classes
+            for cls_name, cls_model in classes.items():
+                objs = self.__session.query(cls_model).all()
+            return objs
+        else:
+            # Query objects based on the specified class
+            objs = self.__session.query(cls).all()
+            return objs
 
+        
     def get(self, cls, **kwargs):
         """
         Retrieve an object from the database based on class and keyword arguments.
@@ -80,6 +68,15 @@ class DBStorage:
                 return None  # Or handle the case when no object is found
         else:
             raise RuntimeError("Session not initialized")
+ 
+    def update(self, update_obj):
+        """
+        Update the database with the provided object.
+        
+        Args:
+            obj: The object to be updated in the database.
+        """
+        self.__session.merge(update_obj)       
 
     def count(self, cls=None):
         """Count the number of objects in the database based on class"""

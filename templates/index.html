@@ -23,8 +23,7 @@
             <li><a href="#">Posts</a></li>
             <li><a href="./signup">Sign Up</a></li>
             <li><a href="./signin">Sign In</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+
         </ul>
     </nav>
     <div class="container">
@@ -32,10 +31,17 @@
         <p>Your source for agricultural news and environmental updates.</p>
         <div>
             <h2> Hot Topics</h2>
+            <ul>
+                {% for article in hot_topics %}
+                    <li><a href="{{ url_for('view_post', post_id=article.id) }}">{{ article.title }}</a></li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
     <footer>
         <p>&copy; 2024 AgricEcho. All rights reserved.</p>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
     </footer>
 </body>
 </html>

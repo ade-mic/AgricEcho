@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/user_home.css">
+    <link rel="stylesheet" href="../static/css/footer.css">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <header>
+        <div class="logo">
+        </div>
+        <a href="/">
+            <h1>AgricEcho</h1>
+        </a>
+    </header>
+    <article>
+        <h1>{{ post.title }}</h1>
+        <p>Author: {{ post.author.first_name }} {{ post.author.last_name }}</p>
+        <p>Date Created: {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>{{ html_content | safe }}</p>
+        <!-- Add more details or actions as needed -->
+    </article>
+
+    <footer>
+        <p>&copy; 2024 AgricEcho. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -26,6 +26,7 @@
             <label for="content">Content:</label><br>
             <textarea id="content" name="content" rows="5" required></textarea><br>
             <input type="submit" value="Post Article">
+ 
         </form>
     
         <hr>
@@ -33,9 +34,11 @@
         <!-- List of previous articles -->
         <h2>Your Previous Articles:</h2>
         <ul>
-            <li><a href="/article/1">Article 1 Title</a></li>
-            <li><a href="/article/2">Article 2 Title</a></li>
-            <!-- Add more articles dynamically -->
+            {% for post in posts %}
+            <li>
+                <h3><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
+            </li>
+            {% endfor %}
         </ul>
     </div>
     <footer>
