@@ -41,3 +41,29 @@ nav ul li a:hover {
     background-color: #ddd;
     border-radius: 5px;
 }
+.container h1 {
+    font-size: 4em;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+.container h2 {
+    font-size: 3em ;
+}
+.container p {
+    text-indent: 10%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-style: italic;
+}
+.container li{
+    list-style-type: none;
+    font-family: "Roboto Slab", serif;
+    font-size: 2em;
+    font-weight: 600;
+    font-style: normal;
+}
+.container a {
+    text-decoration: none;
+}
+.container span {
+    padding-right: 20px;
+}

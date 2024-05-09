@@ -1,56 +1,70 @@
-#!/usr/bin/python3
-"""RESTful API for managing posts using Flask-Restful. """
+    #!/usr/bin/python3
+"""RESTful API for managing posts using Flask-Restful."""
 from flask import Flask, request, g
-from flask_restful import Api, Resource, reqparse, fields, marshal_with
+from flask_restful import Api, Resource, fields, marshal_with
 from flask_login import login_required
 from models import storage
 from models.post import Post
-api = Api()
+
+app = Flask(__name__)
+api = Api(app)
 
 # Fields for serialization
 post_fields = {
     'id': fields.Integer,
     'title': fields.String,
-    'content': fields.String
+    'content': fields.String,
+    'user_id': fields.String
 }
 
 class PostResource(Resource):
-    """class that inherits from Resource to handle CRUD operations for posts."""
+    """Class to handle CRUD operations for posts."""
 
     @marshal_with(post_fields)
-    def get(self, post_id):
-        """Logic to get a specific post by post_id"""
+    def get(self, post_id=None):
+        """Get a specific post by post_id"""
+        if post_id is None:
+            posts = storage.all(Post)
+            result = [{'id': post.id, 'title': post.title} for post in posts]
+            return result
+        # specific post
         post = storage.get(Post, id=post_id)
-        return {'post_id': post.id, 'title': post.title, 'content': post.content}
+        if post:
+            return post
+        else:
+            return {'message': 'Post not found'}, 404
 
     @login_required
+    @marshal_with(post_fields)
     def post(self):
-        """Post an article API"""
-        if g.user is None:
-            return {'message': 'Unathorised'}, 401
-
+        """Create a new post"""
         data = request.get_json()
-        # Logic to create a new post using data, associated with logged-in user
-        new_post  = Post(title=data['title'], content=data['content'],
-                         user_id=g.user.id)
+        new_post = Post(title=data.get('title'), content=data.get('content'), user_id=g.user.id)
         storage.new(new_post)
         storage.save()
-        return {'message': 'Post created successfully'}, 201
+        return new_post, 201
 
     @login_required
-    def put(self):
-        """Update an Article API"""
-        if g.user is None:
-            return {'message': 'Unathorised'}, 401
+    @marshal_with(post_fields)
+    def put(self, post_id):
+        """Update an existing post by post_id"""
+        post = storage.get(Post, id=post_id)
+        if not post:
+            return {'message': 'Post not found'}, 404
         data = request.get_json()
-        # Logic to update an existing post by post_id using data
-        storage.update(data)
+        post.title = data.get('title', post.title)
+        post.content = data.get('content', post.content)
         storage.save()
-        return {'message': 'Post updated successfully'}
+        return post
 
+    @login_required
     def delete(self, post_id):
-        # Logic to delete a post by post_id
+        """Delete a post by post_id"""
+        post = storage.get(Post, id=post_id)
+        if not post:
+            return {'message': 'Post not found'}, 404
+        storage.delete(post)
+        storage.save()
         return {'message': 'Post deleted successfully'}
 
-# Register API resources with Flask app
-api.add_resource(PostResource, '/posts', '/posts/<int:post_id>')
+

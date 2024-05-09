@@ -48,7 +48,6 @@ class DBStorage:
             objs = self.__session.query(cls).all()
             return objs
 
-        
     def get(self, cls, **kwargs):
         """
         Retrieve an object from the database based on class and keyword arguments.
@@ -68,7 +67,7 @@ class DBStorage:
                 return None  # Or handle the case when no object is found
         else:
             raise RuntimeError("Session not initialized")
- 
+
     def update(self, update_obj):
         """
         Update the database with the provided object.

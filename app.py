@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Renders Home Page"""
 from flask import Flask, render_template, redirect, request, url_for, session, flash
+from flask_restful import Api
 from models.base_model import BaseModel, Base
 from models.post import Post
 from models.user import User
@@ -10,11 +11,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models.engine.config import SECRET_KEY
 # from models.engine.db_storage import DBStorage
 from models import storage
-import random
+from post_resource import PostResource
 import markdown2
+# api routes
+from api_routes import api_bp
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+api = Api(app)
+# Register API resources with Flask app
+app.register_blueprint(api_bp, url_prefix='/api')
+
 
 # Define routes
 @app.route('/')
@@ -82,7 +89,7 @@ def signin():
                 return jsonify({'message': 'Signin successful'}), 200
             else:
                 return jsonify({'error': 'Invalid email or password.'}), 401
-        
+
         # Get form data
         email = request.form.get('email')
         password = request.form.get('password')
@@ -142,8 +149,6 @@ def view_post(post_id):
     else:
         flash('Post not found!', 'error')
         return redirect(url_for('user_home'))
-
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000', debug=True)
