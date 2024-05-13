@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """Renders Home Page"""
 from flask import Flask, render_template, redirect, request, url_for, session, flash
-from flask_restful import Api
 from models.base_model import BaseModel, Base
 from models.post import Post
 from models.user import User
@@ -9,13 +8,9 @@ from flask import jsonify
 from os import environ
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.engine.config import SECRET_KEY
-# from models.engine.db_storage import DBStorage
 from models import storage
 from post_resource import PostResource
-import markdown2
-from flask_login import LoginManager
-# api routes
-from api_routes import api_bp
+
 
 app = Flask(__name__)
 app.config.update(
@@ -25,9 +20,6 @@ app.config.update(
     REMEMBER_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Strict",
 )
-
-# Register API resources with Flask app
-app.register_blueprint(api_bp, url_prefix='/api')
 
 
 # Define routes
