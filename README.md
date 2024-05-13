@@ -1,36 +1,52 @@
 # AgricEcho
-AgricEcho is a blogging website focused on agricultural news and environmental topics. This README provides an overview of the website and instructions for setting it up locally.
+AgricEcho is a blogging website focused on agricultural news and environmental topics. 
+The Blogging Platform is built on Flask! This is a simple yet powerful blogging platform built with Flask, a lightweight WSGI web application framework. It's designed to make getting started quick and easy, with the ability to scale up to complex applications.
+
 
 ## Features
-- Categories: Posts are organized into categories such as agriculture, environment, sustainability, etc.
-- Tags: Posts can be tagged with keywords for easy search and navigation.
-- User Authentication: Users can create accounts, log in, and manage their posts.
-- Responsive Design: The website is designed to be mobile-friendly and accessible on various devices.
-- RESTful API: Access data and perform CRUD operations using the RESTful API endpoints.
+
+- **User Authentication**: Sign up, sign in, and log out functionality.
+- **User Dashboard**: Authenticated users can view their posts.
+- **Post Articles**: Authenticated users can create new blog posts.
+- **View Posts**: All visitors can view full content of a post.
+- **Home Page**: Displays all blog posts.
+
 ## Setup
 ### Prerequisites
 - Python 3.x
-- PostgreSQL (optional for production)
-- Installation
-## Clone the repository:
-```git clone https://github.com/your-username/agricecho.git```
-```cd agricecho```
-## Create a virtual environment and activate it:
-```python3 -m venv venv```
-```source venv/bin/activate  # Linux/macOS```
-```venv\Scripts\activate      # Windows```
-## Install dependencies:
-```pip install -r requirements.txt```
+- MySQL  5.7.42
+### Installing
+1. Clone the repository:
+```bash
+git clone git@github.com:ade-mic/AgricEcho.git
+```
+```bash
+cd AgricEcho
+```
+2.  Create a virtual environment and activate it:
+```bash
+python3 -m venv venv
+```
+```bash 
+source venv/bin/activate  # Linux/macOS
+```
+```bash
+venv\Scripts\activate      # Windows
+```
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+4. Run the application
+```bash
+./app.py
+```
 
-## API Endpoints
-- GET /api/posts: Retrieve all posts.
-- POST /api/posts: Create a new post.
-- GET /api/posts/<post_id>: Retrieve a specific post.
-- PUT /api/posts/<post_id>: Update a post.
-- DELETE /api/posts/<post_id>: Delete a post.
-Refer to the API documentation for more details on request and response formats.
+## Built With
+- Flask - The web framework used
+- Python - The programming language used
 
-Contributing
+## Contributing
 We welcome contributions from the community! To contribute:
 
 ## Fork the repository.
