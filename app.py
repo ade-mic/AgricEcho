@@ -13,12 +13,19 @@ from models.engine.config import SECRET_KEY
 from models import storage
 from post_resource import PostResource
 import markdown2
+from flask_login import LoginManager
 # api routes
 from api_routes import api_bp
 
 app = Flask(__name__)
-app.secret_key = SECRET_KEY
-api = Api(app)
+app.config.update(
+    DEBUG=True,
+    SECRET_KEY=SECRET_KEY,
+    SESSION_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Strict",
+)
+
 # Register API resources with Flask app
 app.register_blueprint(api_bp, url_prefix='/api')
 
@@ -149,6 +156,12 @@ def view_post(post_id):
     else:
         flash('Post not found!', 'error')
         return redirect(url_for('user_home'))
+
+@app.route('/logout')
+def logout():
+    """remove the user from the session if it's there"""
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000', debug=True)
